@@ -41,6 +41,8 @@ class VerificationScreen extends StatefulWidget {
 }
 
 class _VerificationScreenState extends State<VerificationScreen> {
+  final otpController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,6 +95,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   Text("Please enter the code"),
                   SizedBox(height: 20),
                   CustomInputField(
+                    controller: otpController,
                     text: "Verification Code",
                   ),
                   SizedBox(height: 20),
@@ -103,16 +106,18 @@ class _VerificationScreenState extends State<VerificationScreen> {
                       height: 50,
                       child: Mutation(
                         options: MutationOptions(
-                          document: gql(verifyMutation),
-                        ),
+                            document: gql(verifyMutation),
+                            onCompleted: (result) {
+                              log(result.toString());
+                            }),
                         builder: (RunMutation runMutation, QueryResult result) {
                           return TextButton(
                             style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all(
                                     Theme.of(context).canvasColor)),
                             onPressed: () {
-                              runMutation({"currency": "USD"});
-                              // log(result.data.toString());
+                              runMutation({"code": otpController.text});
+
                               Navigator.pushNamed(
                                   context, SetupCompleteScreen.id);
                             },
